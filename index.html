@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactives Flashcards Français</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+            position: relative;
+        }
+        #card {
+            background-color: #fff;
+            border: 1px solid #e1e1e1;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        #question {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        #answer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            display: none;
+        }
+        .buttons {
+            margin-top: 30px;
+        }
+        button {
+            background-color: #008cba;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #006f98;
+        }
+        #progress {
+            margin-top: 20px;
+            font-size: 1em;
+            color: #666;
+        }
+        #progressBar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 13px;
+            overflow: hidden;
+            margin-top: 20px;
+            height: 20px;
+            position: relative;
+        }
+        #progressBarFill {
+            height: 100%;
+            width: 0%;
+            background-color: #008cba;
+            transition: width 0.5s;
+        }
+        #timer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        #result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        #result img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+        #reviewButton {
+            display: none;
+        }
+        #timerToggle {
+            margin-top: 20px;
+            display: inline-block;
+        }
+        #timerToggle input {
+            margin-right: 5px;
+        }
+        #homeButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #008cba;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #homeButton:hover {
+            background-color: #006f98;
+        }
+        #previousProgressBar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 13px;
+            overflow: hidden;
+            margin-top: 10px;
+            height: 20px;
+            position: relative;
+        }
+        #previousProgressBarFill {
+            height: 100%;
+            width: 0%;
+            background-color: #008cba;
+            transition: width 0.5s;
+        }
+        #previousResult {
+            font-size: 1em;
+            margin-top: 10px;
+            color: #333;
+        }
+        #resetButton {
+            margin-top: 10px;
+            background-color: #dc3545;
+        }
+        #resetButton:hover {
+            background-color: #b02a37;
+        }
+        #categorySelection {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        #categorySelection label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #startButton {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<button id="homeButton">Retour</button>
+
+<div class="container">
+    <h1>Interactives Flashcards Français</h1>
+
+    <div id="categorySelection">
+        <div id="previousResult" style="display: none;"></div>
+        <div id="previousProgressBar" style="display: none;">
+            <div id="previousProgressBarFill"></div>
+        </div>
+        <button id="resumeButton" style="display: none;">Continuer là où vous étiez</button>
+        <button id="reviewMistakesButton" style="display: none;">Réviser les erreurs</button>
+        <button id="resetButton" style="display: none;">Réinitialiser la progression</button>
+
+        <h2>Sélectionnez un Thème :</h2>
+        <label><input type="checkbox" class="themeCheckbox" value="Thème 1" checked> Thème 1 : Moi et les autres</label>
+        <label><input type="checkbox" class="themeCheckbox" value="Thème 2" checked> Thème 2 : Politique, Société et Pouvoir</label>
+        <label><input type="checkbox" class="themeCheckbox" value="Thème 3" checked> Thème 3 : Droits des femmes, relations familiales, mariage</label>
+
+        <h2>Sélectionnez un Type de mot :</h2>
+        <label><input type="checkbox" class="typeCheckbox" value="Adjectif" checked> Adjectifs</label>
+        <label><input type="checkbox" class="typeCheckbox" value="Nom" checked> Noms</label>
+        <label><input type="checkbox" class="typeCheckbox" value="Expression" checked> Expressions</label>
+        <label><input type="checkbox" class="typeCheckbox" value="Verbe" checked> Verbes</label>
+
+        <button id="startButton">Commencer</button>
+    </div>
+
+    <div id="timerToggle" style="display: none;">
+        <label>
+            <input type="checkbox" id="enableTimer"> Activer le Timer
+        </label>
+    </div>
+    <div id="timer" style="display: none;">Temps: 00:00</div>
+    <div id="progressBar" style="display: none;">
+        <div id="progressBarFill"></div>
+    </div>
+
+    <div id="card" style="display: none;">
+        <div id="question"></div>
+        <div id="answer"></div>
+    </div>
+
+    <div class="buttons">
+        <button id="prevButton" style="display: none;">Question Précédente</button>
+        <button id="showAnswerButton" style="display: none;">Afficher la Réponse</button>
+        <button id="hideAnswerButton" style="display: none;">Cacher la Réponse</button>
+        <button id="correctButton" style="display: none; background-color: #28a745;">Bon</button>
+        <button id="incorrectButton" style="display: none; background-color: #dc3545;">Faux</button>
+        <button id="nextButton" style="display: none;">Question Suivante</button>
+        <button id="restartButton" style="display: none;">Recommencer</button>
+        <button id="reviewButton" style="display: none;">Réviser les Erreurs</button>
+    </div>
+    <div id="progress" style="display: none;"></div>
+    <div id="result"></div>
+</div>
+
+<script>
+// Ici, nous plaçons toutes les cartes de vocabulaire françaises.
+// Format :
+// {
+//    "Theme": "Thème X",
+//    "Type": "Adjectif" ou "Nom" ou "Expression" ou "Verbe",
+//    "Question": "Que signifie 'mot' ?",
+//    "Answer": "Phrase explicative"
+// }
+//
+// Données issues des 3 thèmes fournis. Nous allons classer chaque mot selon son type et son thème.
+// Thème 1 : Moi et les autres
+// Adjectifs (nombreux)
+// Expressions (fin du thème 1)
+// Pas de verbes dans le thème 1 (juste "bâcler" est un verbe -> On le mettra en Verbe)
+// Pas de noms uniquement ? Ici ce sont des "traits de caractère" => On va considérer les traits comme Adjectifs
+// On a aussi des Expressions dans le thème 1.
+
+const allFlashcards = [
+    // THÈME 1 ADJECTIFS
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'actif/active' ?","Answer":"Elle est très active, car elle fait beaucoup de choses comme organiser des événements chaque mois."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'adorable' ?","Answer":"Elle est tellement adorable avec sa gentillesse et son sourire chaleureux que tout le monde se sent bien en sa compagnie."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'agressif/agressive' ?","Answer":"Quand on n'est pas d'accord avec lui, il devient agressif. Il parle très fort, se fâche vite et utilise des mots durs."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'aimable' ?","Answer":"Il est très aimable avec tout le monde, il sourit et parle toujours poliment, même avec des inconnus."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'arrogant/arrogante' ?","Answer":"Elle est trop arrogante, elle parle aux autres comme si elle leur était supérieure."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'attentionné/attentionnée' ?","Answer":"Il est très attentionné, il pense toujours à faire plaisir aux autres."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'audacieux/audacieuse' ?","Answer":"Il est audacieux, il n'a pas peur de prendre des risques pour atteindre ses objectifs."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'bavard/bavarde' ?","Answer":"Mon cousin est très bavard, il ne s'arrête jamais de parler pendant les repas de famille."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'brutal/brutale' ?","Answer":"Il est brutal dans ses actions, il réagit souvent avec force sans réfléchir aux conséquences."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'calme' ?","Answer":"Il est toujours calme, même dans les situations stressantes."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'changeant/changeante' ?","Answer":"Il a un caractère tellement changeant qu'on ne sait jamais à quoi s'attendre."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'consciencieux/consciencieuse' ?","Answer":"Elle est très consciencieuse, elle travaille avec beaucoup de soin."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'craquant/craquante' ?","Answer":"Elle est si craquante que personne ne peut lui résister."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'cultivé/cultivée' ?","Answer":"Elle est très cultivée, elle connaît beaucoup de choses sur l'histoire et l'art."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'désordonné/désordonnée' ?","Answer":"Son bureau est toujours désordonné, on ne trouve rien à sa place."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'déterminé/déterminée' ?","Answer":"Il est déterminé à réussir, rien ne pourra l'arrêter."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'distrait/distraite' ?","Answer":"Il est souvent distrait, oubliant des rendez-vous ou perdant ses affaires."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'dynamique' ?","Answer":"Elle est très dynamique, elle a beaucoup d'énergie et aime participer à toutes les activités."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'équilibré/équilibrée' ?","Answer":"Il est très équilibré, il sait gérer ses émotions et ses responsabilités."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'fonceur/fonceuse' ?","Answer":"C'est un vrai fonceur, il ne se laisse jamais décourager par les obstacles."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'franc/franche' ?","Answer":"Elle est franche, elle dit toujours ce qu'elle pense sans détour."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'froid/froide' ?","Answer":"Elle est froide et distante, elle ne montre jamais ses émotions."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'gentil/gentille' ?","Answer":"Il est tellement gentil, il aide toujours ses amis."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'hésitant/hésitante' ?","Answer":"Il était hésitant avant de prendre la parole, cherchant ses mots."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'impulsif/impulsive' ?","Answer":"Il est trop impulsif, il réagit sans réfléchir aux conséquences."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'indécis/indécise' ?","Answer":"Elle est tellement indécise qu'elle change d'avis plusieurs fois."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'indifférent/indifférente' ?","Answer":"Il reste indifférent à tout, rien ne l'intéresse."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'influençable' ?","Answer":"Elle est influençable, elle suit toujours les conseils des autres sans réfléchir."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'intègre' ?","Answer":"Il est très intègre, il ne triche jamais et respecte toujours les règles."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'intelligent/intelligente' ?","Answer":"Marie est intelligente, elle trouve toujours des solutions aux problèmes."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'irrésistible' ?","Answer":"Son sourire est irrésistible, personne ne peut lui dire non."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'lâche' ?","Answer":"Elle est lâche, elle évite de faire face à ses responsabilités."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'malveillant/malveillante' ?","Answer":"Il a un caractère malveillant, il prend plaisir à nuire aux autres."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'maniaque' ?","Answer":"Il est maniaque, il nettoie son appartement tous les jours."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'méchant/méchante' ?","Answer":"Il peut être vraiment méchant quand il n'obtient pas ce qu'il veut."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'minutieux/minutieuse' ?","Answer":"Il est très minutieux, il vérifie chaque détail."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'modeste' ?","Answer":"Malgré son succès, il est resté modeste, il ne se vante jamais."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'mou/molle' ?","Answer":"Il est trop mou, il manque de motivation et d'énergie."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'négligent/négligente' ?","Answer":"Il est un peu négligent, il oublie de vérifier les détails importants."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'nonchalant/nonchalante' ?","Answer":"Il est trop nonchalant, il oublie toujours de faire ses devoirs à temps."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'odieux/odieuse' ?","Answer":"Son comportement était odieux, tout le monde a quitté la pièce."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'paisible' ?","Answer":"Elle est si paisible que même dans les moments stressants, elle reste calme."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'paresseux/paresseuse' ?","Answer":"Mon frère est paresseux, il préfère regarder la télévision plutôt que de travailler."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'passif/passive' ?","Answer":"Pendant les réunions, il reste passif et ne propose jamais d'idées."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'passionné/passionnée' ?","Answer":"Il est passionné par le football, il ne parle que de ça."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'perfectionniste' ?","Answer":"Il est perfectionniste, il veut que tout soit parfait."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'persévérant/persévérante' ?","Answer":"Elle est persévérante, elle continue même après des échecs."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'peureux/peureuse' ?","Answer":"Ma petite sœur est peureuse, elle a peur de tout."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'prétentieux/prétentieuse' ?","Answer":"Il est très prétentieux, il pense être meilleur que tout le monde."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'prudent/prudente' ?","Answer":"Elle est prudente, elle vérifie toujours avant de décider."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'réfléchi/réfléchie' ?","Answer":"C'est un homme réfléchi, il prend le temps d'analyser avant d'agir."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'serviable' ?","Answer":"Il est serviable, il aide toujours ses amis quand ils en ont besoin."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'sociable' ?","Answer":"Il est sociable et se fait des amis facilement."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'soigneux/soigneuse' ?","Answer":"Il est soigneux, il range toujours ses affaires avec précision."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'spontané/spontanée' ?","Answer":"Elle est spontanée et agit sans hésiter, avec naturel et simplicité."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'têtu/têtue' ?","Answer":"Il est têtu, il refuse de changer d'avis même s'il a tort."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'timide' ?","Answer":"Ma sœur est très timide, elle n'ose pas parler devant beaucoup de gens."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'trouillard/trouillarde' ?","Answer":"Arrête d'être si trouillard, ce n'est qu'une petite araignée !"},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'vif/vive' ?","Answer":"Son esprit est vif, elle comprend très rapidement."},
+    {"Theme":"Thème 1","Type":"Adjectif","Question":"Que signifie 'violent/violente' ?","Answer":"Quand il est en colère, il devient violent et s'emporte facilement."},
+
+    // THÈME 1 EXPRESSIONS
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'aller jusqu’au bout' ?","Answer":"Quand il commence un projet, il aime aller jusqu’au bout et ne jamais abandonner."},
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'avoir du cran' ?","Answer":"Il a du cran, il a osé dire à son patron qu'il n'était pas d'accord."},
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'avoir du tact' ?","Answer":"Elle sait comment dire les choses sans blesser les autres, elle a du tact."},
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'avoir le cœur sur la main' ?","Answer":"Elle a le cœur sur la main, elle donne toujours aux autres sans hésiter."},
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'avoir un bon caractère' ?","Answer":"Elle a un bon caractère, toujours de bonne humeur et agréable."},
+    {"Theme":"Thème 1","Type":"Expression","Question":"Que signifie 'avoir un caractère de cochon' ?","Answer":"Ce matin, il a un caractère de cochon, il se fâche pour tout et rien."},
+
+    // THÈME 1 VERBE
+    {"Theme":"Thème 1","Type":"Verbe","Question":"Que signifie 'bâcler' ?","Answer":"Vous auriez pu bâcler votre travail, le faire sans soin, mais vous avez travaillé sérieusement."},
+
+    // THÈME 2 : Politique, Société et Pouvoir
+    // Ici nous avons beaucoup de noms, adjectifs, verbes, expressions dans le thème 2
+    // Le texte donnait : Noms, Adjectifs, Verbes/Expressions associées
+    // Nous allons tout classer selon leur nature dans le texte :
+    // La plupart des mots du Thème 2 sont des Noms, des Adjectifs et des Verbes/Expressions.
+
+    // THÈME 2 NOMS
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’accès (au pouvoir)' ?","Answer":"Dans une démocratie, l’accès au pouvoir se fait souvent par des élections."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’accession' ?","Answer":"Son accession au poste de premier ministre a surpris tout le monde."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’antisémitisme' ?","Answer":"L’antisémitisme est une forme de discrimination très grave."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’ascension' ?","Answer":"L’ascension de ce leader politique a été très rapide."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’autoritarisme' ?","Answer":"L'autoritarisme se manifeste quand un chef impose ses décisions sans consulter les autres."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’élection' ?","Answer":"Les élections sont un moment clé dans la vie démocratique d’un pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’ennemi(e)' ?","Answer":"Dans une guerre, chaque camp voit l’autre comme son ennemi."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’impunité' ?","Answer":"Les responsables de ces actes ont agi en toute impunité."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’incarcération' ?","Answer":"L’incarcération est souvent utilisée pour punir des crimes graves."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’indépendance' ?","Answer":"La fête de l’indépendance est célébrée chaque année."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’interdiction' ?","Answer":"L’interdiction de manifester a provoqué des protestations."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’intolérance' ?","Answer":"L’intolérance peut créer des conflits dans une société."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’oppresseur(e)' ?","Answer":"Les oppresseurs imposent souvent des lois injustes."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'l’oppression' ?","Answer":"L’oppression des minorités est un problème grave dans certaines régions."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la colère' ?","Answer":"La colère des citoyens grandit face aux injustices."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la dépendance' ?","Answer":"La dépendance des jeunes aux réseaux sociaux est un sujet de débat."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la différence' ?","Answer":"La différence entre une démocratie et une dictature est énorme."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la domination' ?","Answer":"La domination d’un groupe peut être injuste et difficile à supporter."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la famine' ?","Answer":"La famine menace de nombreux pays pauvres."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la fondation (d’un parti)' ?","Answer":"La fondation de ce parti politique a eu lieu en 2024."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la frustration' ?","Answer":"La frustration des jeunes peut mener à des protestations."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la haine' ?","Answer":"La haine entre certains groupes peut conduire à des conflits."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la justice' ?","Answer":"La justice est importante pour le bon fonctionnement d’une société."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la libération' ?","Answer":"La libération des prisonniers politiques a été célébrée par la population."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la liberté' ?","Answer":"La liberté est un droit fondamental dans une démocratie."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la nation' ?","Answer":"La fête nationale célèbre l’unité de la nation."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la peur' ?","Answer":"La peur de perdre ses droits pousse les gens à se mobiliser."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la république' ?","Answer":"La France est une république où le président est élu tous les cinq ans."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la terreur' ?","Answer":"Pendant la dictature, la terreur régnait dans le pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la tolérance' ?","Answer":"La tolérance est nécessaire pour pouvoir vivre ensemble."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la transparence' ?","Answer":"La transparence est essentielle pour faire confiance aux dirigeants."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la victime' ?","Answer":"Les victimes d’injustice demandent réparation."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'la/les circonstance(s)' ?","Answer":"Les circonstances de cet événement restent mystérieuses."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le cauchemar' ?","Answer":"Pour beaucoup, la guerre est un vrai cauchemar."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le chômage' ?","Answer":"Le chômage est un problème majeur dans de nombreux pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le citoyen, la citoyenne' ?","Answer":"Chaque citoyen a le droit de s’exprimer."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le coup d’État' ?","Answer":"Le coup d’État a bouleversé la vie politique du pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le fascisme' ?","Answer":"Le fascisme ne tolère pas la liberté d'expression."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le gouvernement' ?","Answer":"Le gouvernement prend des décisions pour le bien de la population."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le mensonge' ?","Answer":"Les mensonges des politiciens peuvent entraîner une perte de confiance."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le multiculturalisme' ?","Answer":"Le multiculturalisme enrichit les échanges et la compréhension entre les peuples."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le nationalisme' ?","Answer":"Le nationalisme peut parfois créer des tensions entre pays voisins."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le racisme' ?","Answer":"Le racisme est interdit par la loi dans de nombreux pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le respect' ?","Answer":"Le respect des opinions des autres est essentiel dans une démocratie."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le suffrage universel' ?","Answer":"Grâce au suffrage universel, chaque citoyen peut choisir ses dirigeants."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le totalitarisme' ?","Answer":"Dans un régime totalitaire, les libertés individuelles sont réduites."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'le vote' ?","Answer":"Le vote est un moyen de participer à la démocratie."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'les conditions' ?","Answer":"Les conditions de vie peuvent être difficiles dans certains pays."},
+    {"Theme":"Thème 2","Type":"Nom","Question":"Que signifie 'les Droits de l’Homme' ?","Answer":"Les Droits de l'Homme protègent la liberté et la dignité de chacun."},
+
+    // THÈME 2 ADJECTIFS
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'abrégé' ?","Answer":"Ce texte est présenté en abrégé pour être plus facile à lire."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie '(in)dépendant(e)' ?","Answer":"Un pays indépendant peut prendre ses propres décisions."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie '(in)tolérant(e)' ?","Answer":"Être tolérant permet de vivre en paix avec des personnes différentes."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'antisémite' ?","Answer":"Les propos antisémites sont interdits par la loi."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'arbitraire' ?","Answer":"La décision de fermer le parc a été jugée arbitraire par les habitants."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'autoritaire' ?","Answer":"Un dirigeant autoritaire ne laisse pas beaucoup de liberté aux citoyens."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'différent(e)' ?","Answer":"Nous avons tous des opinions différentes sur ce sujet."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'dominé(e)' ?","Answer":"Ce pays est dominé par un groupe militaire."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'élu(e)' ?","Answer":"Le président élu représente le choix du peuple."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'fondé(e)' ?","Answer":"Cette organisation fondée en 1990 aide les enfants."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'frustré(e)' ?","Answer":"Les étudiants sont frustrés de ne pas être écoutés."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'gouverné(e)' ?","Answer":"Ce pays est gouverné par un président élu."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'haineux/haineuse' ?","Answer":"Les commentaires haineux ne sont pas tolérés sur les réseaux sociaux."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'impuni(e)' ?","Answer":"Les actes de violence ne devraient jamais rester impunis."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'incarcéré(e)' ?","Answer":"Les criminels dangereux sont incarcérés pour protéger la société."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'interdit(e)' ?","Answer":"Dans ce pays, certaines opinions sont interdites."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'libérateur' ?","Answer":"La chute de la dictature a été un moment libérateur pour le peuple."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'libre' ?","Answer":"Dans une démocratie, chaque citoyen est libre de s'exprimer."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'mensonger/mensongère' ?","Answer":"La campagne électorale était remplie d’informations mensongères."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'multiculturel(le)' ?","Answer":"Cette ville multiculturelle est riche en diversité."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'naïf/naïve' ?","Answer":"Il est parfois trop naïf et fait confiance à tout le monde."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'national(e)' ?","Answer":"La fête nationale rassemble tous les citoyens du pays."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'oppressé(e)' ?","Answer":"Les gens oppressés cherchent souvent à obtenir plus de liberté."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'raciste' ?","Answer":"Les propos racistes sont punis par la loi."},
+    {"Theme":"Thème 2","Type":"Adjectif","Question":"Que signifie 'respectueux/respectueuse' ?","Answer":"Un bon citoyen est respectueux des lois et des autres."},
+
+    // THÈME 2 VERBES / EXPRESSIONS
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'accéder (au pouvoir)' ?","Answer":"Il a travaillé dur pour accéder au pouvoir."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'adhérer (à un parti)' ?","Answer":"Elle a décidé d’adhérer à un parti pour défendre ses idées."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'basculer (dans la dictature)' ?","Answer":"Le pays a basculé dans la dictature après le coup d’État."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'combattre' ?","Answer":"Ils ont décidé de combattre l’injustice."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'dépendre de' ?","Answer":"Les jeunes dépendent souvent de leurs parents."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être à la merci de' ?","Answer":"Les citoyens sont à la merci de ce dictateur."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être dans les chaines de' ?","Answer":"Le peuple, longtemps dans les chaînes de la dictature, a retrouvé sa liberté."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être dépendant de' ?","Answer":"Beaucoup de gens sont dépendants des nouvelles technologies."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être en mon (ton/son) pouvoir' ?","Answer":"Il est en mon pouvoir de décider de cette question."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être plein(e) d’espoir' ?","Answer":"Elle est pleine d’espoir pour l’avenir de son pays."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être sans défense' ?","Answer":"Les victimes de la guerre sont souvent sans défense."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être sous l’emprise de' ?","Answer":"Il est sous l’emprise de cette idéologie."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être sous la coupe de' ?","Answer":"Elle est sous la coupe de son chef autoritaire."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être sous la domination de' ?","Answer":"Ce peuple est sous la domination d’un régime dictatorial."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être sous le joug de' ?","Answer":"Ils vivaient sous le joug de la tyrannie."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'être victime de' ?","Answer":"Elle est victime de discrimination dans son école."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'garder son libre arbitre' ?","Answer":"Malgré les pressions, il a gardé son libre arbitre."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'libérer' ?","Answer":"Les prisonniers ont été libérés après la fin du conflit."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'se libérer de' ?","Answer":"Elle veut se libérer de l'influence de son entourage."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'tolérer' ?","Answer":"Dans une démocratie, on doit tolérer les opinions des autres."},
+    {"Theme":"Thème 2","Type":"Expression","Question":"Que signifie 'tomber dans les griffes de' ?","Answer":"Le pays est tombé dans les griffes d'un dictateur."},
+    {"Theme":"Thème 2","Type":"Verbe","Question":"Que signifie 'voter' ?","Answer":"Tous les citoyens ont le droit de voter aux élections."},
+
+    // THÈME 3 : Droits des femmes, mariage, etc.
+    // On a des Noms, Adjectifs, Verbes
+    // Pas d'expressions notables (juste définitions)
+    // On classe selon type: la plupart sont Noms, quelques Adjectifs, et 3 verbes.
+
+    // THÈME 3 NOMS
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'l’adultère' ?","Answer":"L’adultère est souvent un motif de divorce."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'l’analphabétisme' ?","Answer":"L’analphabétisme touche encore beaucoup de femmes dans certains pays."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'l’autonomie' ?","Answer":"L’autonomie des femmes est importante pour leur indépendance économique."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'l’avortement' ?","Answer":"Le droit à l’avortement est un sujet de débat dans de nombreux pays."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la contraception' ?","Answer":"La contraception permet aux femmes de choisir le moment pour avoir un enfant."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la dot' ?","Answer":"Dans certaines cultures, la dot fait encore partie des mariages traditionnels."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la famille nombreuse' ?","Answer":"Les familles nombreuses peuvent rencontrer des difficultés financières."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la justice à deux vitesses' ?","Answer":"La justice à deux vitesses pénalise souvent les personnes les plus vulnérables."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la lapidation' ?","Answer":"La lapidation est interdite dans la plupart des pays en raison de sa brutalité."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la maltraitance conjugale' ?","Answer":"La maltraitance conjugale est un problème grave qui touche beaucoup de femmes."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la mère au foyer' ?","Answer":"Être mère au foyer est un choix pour certaines femmes."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la monogamie' ?","Answer":"Dans la plupart des pays, le mariage est basé sur la monogamie."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la polygamie' ?","Answer":"La polygamie est autorisée dans certaines cultures, mais interdite dans d’autres."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'la traite des femmes' ?","Answer":"La traite des femmes est un crime grave contre les droits humains."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le congé de maternité' ?","Answer":"Le congé de maternité permet aux nouvelles mères de se reposer et de s’occuper de leur bébé."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le crime d’honneur' ?","Answer":"Le crime d’honneur est puni par la loi dans la plupart des pays."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le divorce' ?","Answer":"Le divorce est parfois la seule solution pour les couples en conflit."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le droit de vote' ?","Answer":"Le droit de vote des femmes a été acquis après de nombreuses luttes."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le mariage forcé' ?","Answer":"Le mariage forcé est interdit par la loi dans de nombreux pays."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le prostitué, la prostituée' ?","Answer":"Les prostitué(e)s sont souvent victimes de discrimination."},
+    {"Theme":"Thème 3","Type":"Nom","Question":"Que signifie 'le veuf, la veuve' ?","Answer":"La veuve de l’ancien président continue d’aider les associations."},
+
+    // THÈME 3 ADJECTIFS
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'analphabète' ?","Answer":"Dans certaines régions, de nombreuses femmes restent analphabètes faute d'accès à l'éducation."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'autonome' ?","Answer":"Être autonome est important pour pouvoir gérer sa vie indépendamment."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'contraceptif/contraceptive' ?","Answer":"Les pilules contraceptives sont souvent utilisées pour éviter une grossesse non désirée."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'divorcé/divorcée' ?","Answer":"Elle est divorcée et élève ses enfants seule."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'lapidé/lapidée' ?","Answer":"Dans certaines régions, les personnes accusées d’adultère risquent d'être lapidées."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'ménopausée' ?","Answer":"Une femme ménopausée peut ressentir certains changements physiques et émotionnels."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'monogame' ?","Answer":"La plupart des couples choisissent d'être monogames."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'polygame' ?","Answer":"Dans certaines cultures, il est encore courant d'être polygame."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'répudié/répudiée' ?","Answer":"Dans certaines cultures, une femme répudiée perd ses droits et se retrouve sans ressources."},
+    {"Theme":"Thème 3","Type":"Adjectif","Question":"Que signifie 'veuf/veuve' ?","Answer":"Depuis la mort de son mari, elle est veuve et vit seule."},
+
+    // THÈME 3 VERBES
+    {"Theme":"Thème 3","Type":"Verbe","Question":"Que signifie 'être à la retraite' ?","Answer":"Mon grand-père est à la retraite et profite de son temps libre pour voyager."},
+    {"Theme":"Thème 3","Type":"Verbe","Question":"Que signifie 'lapider' ?","Answer":"Dans certains pays, on continue de lapider des personnes accusées de certains crimes."},
+    {"Theme":"Thème 3","Type":"Verbe","Question":"Que signifie 'répudier' ?","Answer":"Dans certaines cultures, un homme peut répudier sa femme sans explication."},
+    {"Theme":"Thème 3","Type":"Expression","Question":"Que signifie 'rester sans voix' ?","Answer":"En entendant la nouvelle, elle est restée sans voix."}
+];
+
+let selectedThemes = [];
+let selectedTypes = [];
+let selectedFlashcards = [];
+let currentIndex = 0;
+let incorrectCards = [];
+let reviewingIncorrect = false;
+let timerEnabled = false;
+let timerInterval;
+let startTime;
+let correctAnswers = 0;
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Charger la progression si disponible
+window.addEventListener('load', function() {
+    loadProgress();
+});
+
+function loadProgress() {
+    const savedData = localStorage.getItem('flashcardProgress');
+    if (savedData) {
+        const progressData = JSON.parse(savedData);
+        if (progressData.completed) {
+            document.getElementById('previousResult').style.display = 'block';
+            document.getElementById('previousResult').textContent = `Vous aviez ${progressData.score}% de bonnes réponses la dernière fois.`;
+            document.getElementById('previousProgressBar').style.display = 'block';
+            document.getElementById('previousProgressBarFill').style.width = progressData.score + '%';
+            if (progressData.incorrectCards && progressData.incorrectCards.length > 0) {
+                document.getElementById('reviewMistakesButton').style.display = 'inline-block';
+            }
+        } else {
+            if (confirm('Vous avez une session inachevée. Voulez-vous reprendre où vous en étiez ?')) {
+                selectedThemes = progressData.selectedThemes;
+                selectedTypes = progressData.selectedTypes;
+                selectedFlashcards = progressData.selectedFlashcards;
+                currentIndex = progressData.currentIndex;
+                incorrectCards = progressData.incorrectCards;
+                reviewingIncorrect = progressData.reviewingIncorrect;
+                timerEnabled = progressData.timerEnabled;
+                correctAnswers = progressData.correctAnswers;
+
+                document.getElementById('categorySelection').style.display = 'none';
+                document.getElementById('timerToggle').style.display = 'block';
+                document.getElementById('progressBar').style.display = 'block';
+                document.getElementById('card').style.display = 'block';
+                document.getElementById('showAnswerButton').style.display = 'inline-block';
+                document.getElementById('progress').style.display = 'block';
+                document.getElementById('homeButton').style.display = 'block';
+
+                if (timerEnabled) {
+                    startTime = Date.now() - progressData.elapsedTime;
+                    startTimer();
+                    document.getElementById('timer').style.display = 'block';
+                    document.getElementById('enableTimer').checked = true;
+                } else {
+                    document.getElementById('timer').style.display = 'none';
+                    document.getElementById('enableTimer').checked = false;
+                }
+
+                showQuestion();
+                return;
+            } else {
+                localStorage.removeItem('flashcardProgress');
+            }
+        }
+        document.getElementById('resetButton').style.display = 'inline-block';
+    }
+}
+
+document.getElementById('startButton').addEventListener('click', function() {
+    const themeCheck = document.querySelectorAll('.themeCheckbox');
+    selectedThemes = [];
+    themeCheck.forEach(function(ch) {
+        if (ch.checked) selectedThemes.push(ch.value);
+    });
+
+    const typeCheck = document.querySelectorAll('.typeCheckbox');
+    selectedTypes = [];
+    typeCheck.forEach(function(ch) {
+        if (ch.checked) selectedTypes.push(ch.value);
+    });
+
+    if (selectedThemes.length === 0 || selectedTypes.length === 0) {
+        alert('Veuillez sélectionner au moins un thème et un type de mot.');
+        return;
+    }
+
+    selectedFlashcards = allFlashcards.filter(function(card) {
+        return selectedThemes.includes(card.Theme) && selectedTypes.includes(card.Type);
+    });
+
+    if (selectedFlashcards.length === 0) {
+        alert('Aucune flashcard disponible pour ces sélections.');
+        return;
+    }
+
+    shuffleArray(selectedFlashcards);
+
+    document.getElementById('categorySelection').style.display = 'none';
+    document.getElementById('timerToggle').style.display = 'block';
+    document.getElementById('progressBar').style.display = 'block';
+    document.getElementById('card').style.display = 'block';
+    document.getElementById('showAnswerButton').style.display = 'inline-block';
+    document.getElementById('progress').style.display = 'block';
+    document.getElementById('homeButton').style.display = 'block';
+
+    currentIndex = 0;
+    incorrectCards = [];
+    reviewingIncorrect = false;
+    correctAnswers = 0;
+
+    saveProgress();
+    showQuestion();
+});
+
+document.getElementById('enableTimer').addEventListener('change', function() {
+    timerEnabled = this.checked;
+    if (timerEnabled) {
+        startTimer();
+        document.getElementById('timer').style.display = 'block';
+    } else {
+        stopTimer();
+        document.getElementById('timer').style.display = 'none';
+    }
+});
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    document.getElementById('timer').textContent = 'Temps: 00:00';
+}
+
+function updateTimer() {
+    let elapsed = Date.now() - startTime;
+    let seconds = Math.floor(elapsed / 1000) % 60;
+    let minutes = Math.floor(elapsed / (1000 * 60));
+    let formattedTime = `Temps: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    document.getElementById('timer').textContent = formattedTime;
+}
+
+function updateProgressBar() {
+    let progressPercentage = ((currentIndex + 1) / selectedFlashcards.length) * 100;
+    document.getElementById('progressBarFill').style.width = progressPercentage + '%';
+}
+
+function showQuestion() {
+    const card = selectedFlashcards[currentIndex];
+    document.getElementById('question').textContent = card.Question;
+    document.getElementById('answer').textContent = card.Answer;
+    document.getElementById('answer').style.display = 'none';
+
+    document.getElementById('showAnswerButton').style.display = 'inline-block';
+    document.getElementById('hideAnswerButton').style.display = 'none';
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'none';
+    document.getElementById('prevButton').style.display = currentIndex > 0 ? 'inline-block' : 'none';
+    document.getElementById('progress').textContent = `Question ${currentIndex + 1} sur ${selectedFlashcards.length}`;
+    document.getElementById('result').textContent = '';
+    updateProgressBar();
+}
+
+function showAnswer() {
+    document.getElementById('answer').style.display = 'block';
+    document.getElementById('showAnswerButton').style.display = 'none';
+    document.getElementById('hideAnswerButton').style.display = 'inline-block';
+    document.getElementById('correctButton').style.display = 'inline-block';
+    document.getElementById('incorrectButton').style.display = 'inline-block';
+}
+
+function hideAnswer() {
+    document.getElementById('answer').style.display = 'none';
+    document.getElementById('hideAnswerButton').style.display = 'none';
+    document.getElementById('showAnswerButton').style.display = 'inline-block';
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+}
+
+function markCorrect() {
+    correctAnswers++;
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'inline-block';
+    saveProgress();
+}
+
+function markIncorrect() {
+    incorrectCards.push(selectedFlashcards[currentIndex]);
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'inline-block';
+    saveProgress();
+}
+
+function nextQuestion() {
+    if (currentIndex < selectedFlashcards.length - 1) {
+        currentIndex++;
+        showQuestion();
+        saveProgress();
+    } else {
+        endSession();
+    }
+}
+
+function prevQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showQuestion();
+    }
+}
+
+function endSession() {
+    document.getElementById('card').style.display = 'none';
+    document.getElementById('showAnswerButton').style.display = 'none';
+    document.getElementById('prevButton').style.display = 'none';
+    document.getElementById('hideAnswerButton').style.display = 'none';
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'none';
+    document.getElementById('progress').style.display = 'none';
+    document.getElementById('timerToggle').style.display = 'none';
+    if (timerEnabled) {
+        stopTimer();
+    }
+
+    let score = Math.round((correctAnswers / selectedFlashcards.length) * 100);
+    let progressData = {
+        completed: true,
+        score: score,
+        incorrectCards: incorrectCards
+    };
+    localStorage.setItem('flashcardProgress', JSON.stringify(progressData));
+
+    if (!reviewingIncorrect && incorrectCards.length === 0) {
+        document.getElementById('result').innerHTML = `Félicitations ! Vous avez tout bon !<br><img src="https://media.tenor.com/iVC0JYsOYSoAAAAC/celebrate-happy.gif" alt="Félicitations!">`;
+    } else if (!reviewingIncorrect && incorrectCards.length > 0) {
+        document.getElementById('result').textContent = `Vous avez eu ${incorrectCards.length} erreurs sur ${selectedFlashcards.length}. Votre score est de ${score}%.`;
+        document.getElementById('reviewButton').style.display = 'inline-block';
+    } else {
+        document.getElementById('result').textContent = 'Vous avez terminé toutes les questions !';
+    }
+    document.getElementById('restartButton').style.display = 'inline-block';
+}
+
+function restart() {
+    localStorage.removeItem('flashcardProgress');
+
+    document.getElementById('categorySelection').style.display = 'block';
+    document.getElementById('timerToggle').style.display = 'none';
+    document.getElementById('progressBar').style.display = 'none';
+    document.getElementById('card').style.display = 'none';
+    document.getElementById('prevButton').style.display = 'none';
+    document.getElementById('showAnswerButton').style.display = 'none';
+    document.getElementById('hideAnswerButton').style.display = 'none';
+    document.getElementById('correctButton').style.display = 'none';
+    document.getElementById('incorrectButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'none';
+    document.getElementById('restartButton').style.display = 'none';
+    document.getElementById('reviewButton').style.display = 'none';
+    document.getElementById('progress').style.display = 'none';
+    document.getElementById('result').textContent = '';
+    document.getElementById('timer').style.display = 'none';
+    document.getElementById('enableTimer').checked = false;
+    document.getElementById('homeButton').style.display = 'none';
+    timerEnabled = false;
+    if (timerInterval) {
+        stopTimer();
+    }
+    loadProgress();
+}
+
+function reviewIncorrect() {
+    if (incorrectCards.length > 0) {
+        selectedFlashcards = incorrectCards.slice();
+        currentIndex = 0;
+        incorrectCards = [];
+        reviewingIncorrect = true;
+        correctAnswers = 0;
+        document.getElementById('card').style.display = 'block';
+        document.getElementById('reviewButton').style.display = 'none';
+        document.getElementById('restartButton').style.display = 'none';
+        document.getElementById('progress').style.display = 'block';
+        document.getElementById('result').textContent = '';
+        document.getElementById('timerToggle').style.display = 'block';
+        if (timerEnabled) {
+            stopTimer();
+            startTimer();
+        }
+        showQuestion();
+    }
+}
+
+function saveProgress() {
+    const progressData = {
+        selectedThemes: selectedThemes,
+        selectedTypes: selectedTypes,
+        selectedFlashcards: selectedFlashcards,
+        currentIndex: currentIndex,
+        incorrectCards: incorrectCards,
+        reviewingIncorrect: reviewingIncorrect,
+        timerEnabled: timerEnabled,
+        elapsedTime: timerEnabled ? Date.now() - startTime : 0,
+        correctAnswers: correctAnswers
+    };
+    localStorage.setItem('flashcardProgress', JSON.stringify(progressData));
+}
+
+window.addEventListener('beforeunload', function() {
+    saveProgress();
+});
+
+document.getElementById('showAnswerButton').addEventListener('click', showAnswer);
+document.getElementById('hideAnswerButton').addEventListener('click', hideAnswer);
+document.getElementById('correctButton').addEventListener('click', markCorrect);
+document.getElementById('incorrectButton').addEventListener('click', markIncorrect);
+document.getElementById('nextButton').addEventListener('click', nextQuestion);
+document.getElementById('prevButton').addEventListener('click', prevQuestion);
+document.getElementById('restartButton').addEventListener('click', restart);
+document.getElementById('reviewButton').addEventListener('click', reviewIncorrect);
+document.getElementById('homeButton').addEventListener('click', restart);
+document.getElementById('resetButton').addEventListener('click', function() {
+    if (confirm('Êtes-vous sûr de vouloir réinitialiser la progression ?')) {
+        localStorage.removeItem('flashcardProgress');
+        location.reload();
+    }
+});
+document.getElementById('reviewMistakesButton').addEventListener('click', function() {
+    const savedData = JSON.parse(localStorage.getItem('flashcardProgress'));
+    if (savedData && savedData.incorrectCards && savedData.incorrectCards.length > 0) {
+        selectedFlashcards = savedData.incorrectCards.slice();
+        currentIndex = 0;
+        incorrectCards = [];
+        reviewingIncorrect = true;
+        correctAnswers = 0;
+        document.getElementById('categorySelection').style.display = 'none';
+        document.getElementById('resetButton').style.display = 'none';
+        document.getElementById('reviewMistakesButton').style.display = 'none';
+        document.getElementById('timerToggle').style.display = 'block';
+        document.getElementById('progressBar').style.display = 'block';
+        document.getElementById('card').style.display = 'block';
+        document.getElementById('showAnswerButton').style.display = 'inline-block';
+        document.getElementById('progress').style.display = 'block';
+        document.getElementById('homeButton').style.display = 'block';
+        if (timerEnabled) {
+            stopTimer();
+            startTimer();
+        }
+        showQuestion();
+    }
+});
+</script>
+
+</body>
+</html>
